@@ -1,13 +1,9 @@
-#![feature(test)]
-extern crate test;
-
 use byteorder::{BigEndian, ReadBytesExt};
 use std::fs;
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::Cursor;
 use std::io::SeekFrom;
-use test::Bencher;
 
 static FILE_PATH: &str = "database_fixture";
 static RECORD_SIZE: u64 = 14; // bytes
@@ -66,64 +62,4 @@ pub fn read_line(f: &mut std::fs::File, buffer: &mut [u8; 14], line_num: u64) ->
         .expect("Fail to seek record");
     f.read_exact(buffer).expect("Fail to read buffer");
     buffer.clone()
-}
-
-#[bench]
-fn binary_search_has_match(b: &mut Bencher) {
-    let target = [221, 93, 88, 98, 146, 95, 31, 149, 60, 171];
-    b.iter(|| {
-        check_pwn(target);
-    });
-}
-
-#[bench]
-fn binary_search_no_match(b: &mut Bencher) {
-    let target = [221, 93, 88, 98, 146, 95, 31, 149, 60, 11];
-    b.iter(|| {
-        check_pwn(target);
-    });
-}
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn check_all_exisiting_records() {
-        assert_eq!(187, crate::check_pwn([4, 5, 58, 123, 138, 105, 87, 130, 42, 26]));
-        assert_eq!(2, crate::check_pwn([17, 174, 226, 73, 23, 62, 136, 125, 51, 27]));
-        assert_eq!(
-            342,
-            crate::run([45, 177, 142, 29, 152, 231, 171, 127, 73, 222])
-        );
-        assert_eq!(
-            522,
-            crate::run([52, 251, 51, 0, 185, 167, 123, 235, 220, 152])
-        );
-        assert_eq!(9, crate::run([53, 47, 120, 41, 162, 56, 75, 0, 28, 193]));
-        assert_eq!(1, crate::run([90, 212, 49, 72, 201, 10, 143, 45, 41, 111]));
-        assert_eq!(
-            248,
-            crate::run([165, 17, 180, 26, 189, 82, 154, 35, 117, 166])
-        );
-        assert_eq!(
-            823,
-            crate::run([221, 93, 88, 98, 146, 95, 31, 149, 60, 171])
-        );
-        assert_eq!(
-            127,
-            crate::run([224, 153, 106, 55, 193, 61, 68, 195, 176, 96])
-        );
-        assert_eq!(
-            122,
-            crate::run([228, 177, 247, 160, 235, 36, 35, 105, 236, 166])
-        );
-    }
-
-    #[test]
-    fn check_non_exisiting_records() {
-        assert_eq!(0, crate::run([0, 0, 0, 0, 0, 0, 0, 0, 0, 1]));
-        assert_eq!(
-            0,
-            crate::run([228, 17, 47, 160, 235, 36, 35, 105, 236, 166])
-        );
-    }
 }
